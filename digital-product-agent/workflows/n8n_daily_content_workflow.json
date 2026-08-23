@@ -1,0 +1,22 @@
+{
+  "name": "AI Healthcare Growth Agent - Daily Content",
+  "nodes": [
+    {"parameters": {}, "id": "1", "name": "Daily Trigger", "type": "n8n-nodes-base.cron", "typeVersion": 1, "position": [0,0]},
+    {"parameters": {"jsCode": "return [{json:{product:'AI Healthcare Growth Kit', platform:'Instagram', topic:'Use the next READY item from your content calendar', specialty:'Healthcare marketing', audience:'Doctors, clinics and healthcare marketers', language:'English', tone:'professional, practical, trustworthy', offer:'Complete Bundle ₹1,999', approvalRequired:true}}];"}, "id": "2", "name": "Build Content Brief", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [220,0]},
+    {"parameters": {"resource": "chat", "operation": "complete", "model": "gpt-4.1-mini", "messages": {"values": [{"role": "system", "content": "You are the AI Healthcare Growth Kit content agent. Return only valid JSON with hook, caption, script, cta, hashtags, thumbnail_text, visual_brief, disclaimer, claims_to_verify. Never diagnose viewers, promise medical outcomes, invent medical statistics/citations, or expose patient information. Flag clinical claims for human review."},{"role": "user", "content": "Generate one social post using this brief: {{$json}}"}]}, "options": {"responseFormat": "json_object"}}, "id": "3", "name": "AI Generate", "type": "n8n-nodes-base.openAi", "typeVersion": 1, "position": [460,0]},
+    {"parameters": {"jsCode": "const x=$json; const text=JSON.stringify(x); const blocked=[/guarantee/i,/100% cure/i,/diagnose you/i,/patient name/i]; const hit=blocked.filter(r=>r.test(text)); return [{json:{...x,qa_status:hit.length?'BLOCK':'REVIEW',qa_issues:hit.map(r=>r.toString()),approvalRequired:true}}];"}, "id": "4", "name": "Healthcare QA Gate", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [700,0]},
+    {"parameters": {"conditions": {"string": [{"value1": "={{$json.qa_status}}", "operation": "equal", "value2": "REVIEW"}]}}, "id": "5", "name": "Human Approval Required", "type": "n8n-nodes-base.if", "typeVersion": 2, "position": [920,0]},
+    {"parameters": {"respondWith": "json", "responseBody": "={{ {status:'AWAITING_APPROVAL', content:$json} }}"}, "id": "6", "name": "Approval Payload", "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1, "position": [1150,-100]},
+    {"parameters": {"jsCode": "return [{json:{status:'READY_FOR_PUBLISHING', content:$json, note:'Connect this output to your approved social publishing provider/API.'}}];"}, "id": "7", "name": "Publishing Adapter", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [1150,100]}
+  ],
+  "connections": {
+    "Daily Trigger": {"main":[[{"node":"Build Content Brief","type":"main","index":0}]]},
+    "Build Content Brief": {"main":[[{"node":"AI Generate","type":"main","index":0}]]},
+    "AI Generate": {"main":[[{"node":"Healthcare QA Gate","type":"main","index":0}]]},
+    "Healthcare QA Gate": {"main":[[{"node":"Human Approval Required","type":"main","index":0}]]},
+    "Human Approval Required": {"main":[[{"node":"Approval Payload","type":"main","index":0}],[{"node":"Publishing Adapter","type":"main","index":0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1"},
+  "versionId": "1"
+}
