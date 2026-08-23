@@ -1,0 +1,12 @@
+{
+  "product_name": "AI Healthcare Growth Kit",
+  "primary_offer": {"price_inr": 1999, "name": "Complete Bundle"},
+  "agency_offer": {"price_inr": 4999, "name": "Agency Commercial License"},
+  "audience": ["doctors", "clinics", "hospitals", "healthcare_marketers", "healthcare_agencies"],
+  "promise": "Create professional healthcare marketing content faster with a reusable AI content system.",
+  "pillars": ["education", "myth_busting", "FAQs", "trust", "behind_the_scenes", "soft_conversion", "product_demo"],
+  "platforms": ["Instagram", "Facebook", "YouTube Shorts", "LinkedIn", "Pinterest"],
+  "cadence": {"daily_drafts": 1, "weekly_reels": 3, "weekly_promotional_posts": 2},
+  "approval_required": true,
+  "healthcare_claim_review_required": true
+}
